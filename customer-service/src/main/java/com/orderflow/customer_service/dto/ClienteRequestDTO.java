@@ -25,5 +25,3 @@ public class ClienteRequestDTO {
     @NotBlank(message = "Endereço é obrigatório")
     private String endereco;
 }
-
-}
