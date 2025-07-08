@@ -12,7 +12,7 @@
         </processorPath>
         <module name="customer-service" />
       </profile>
-      <profile name="Annotation profile for stock-service" enabled="true">
+      <profile name="Annotation profile for order-service" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
@@ -21,6 +21,7 @@
         </processorPath>
         <module name="stock-service" />
         <module name="product-service" />
+        <module name="order-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -30,6 +31,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="customer-service" options="-parameters" />
+      <module name="order-service" options="-parameters" />
       <module name="orderflow-cliente" options="-parameters" />
       <module name="product-service" options="-parameters" />
       <module name="stock-service" options="-parameters" />

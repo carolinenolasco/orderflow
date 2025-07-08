@@ -40,5 +40,14 @@ services:
     depends_on:
       - postgres
 
+  order-service:
+    build:
+      context: ./order-service
+    container_name: order-service
+    ports:
+      - "8084:8084"
+    depends_on:
+      - postgres
+
 volumes:
   pgdata:
