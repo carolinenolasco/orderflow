@@ -31,5 +31,14 @@ services:
     depends_on:
       - postgres
 
+  stock-service:
+    build:
+      context: ./stock-service
+    container_name: stock-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - postgres
+
 volumes:
   pgdata:
