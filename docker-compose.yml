@@ -61,5 +61,12 @@ services:
       - stock-service
       - order-service
 
+  payment-service:
+    build:
+      context: ./payment-service
+    container_name: payment-service
+    ports:
+      - "8086:8086"
+
 volumes:
   pgdata:
