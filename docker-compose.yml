@@ -49,5 +49,17 @@ services:
     depends_on:
       - postgres
 
+  order-receiver-service:
+    build:
+      context: ./order-receiver-service
+    container_name: order-receiver-service
+    ports:
+      - "8085:8085"
+    depends_on:
+      - customer-service
+      - product-service
+      - stock-service
+      - order-service
+
 volumes:
   pgdata:
