@@ -5,16 +5,14 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor @Builder
 public class PedidoReceiverRequestDTO {
 
-    @NotNull(message = "Cliente obrigatório")
+    @NotNull
     private Long clienteId;
 
-    @NotNull(message = "Lista de itens obrigatória")
+    @NotNull
     private List<ItemPedidoReceiverDTO> itens;
 }
+

@@ -35,24 +35,25 @@ public class PedidoReceiverService {
             throw new RuntimeException("Cliente não encontrado: ID " + receiverDTO.getClienteId());
         }
 
-        // Lista com itens preenchidos com preço
+        // Lista final com preços para montar o pedido
         List<ItemPedidoDTO> itensComPreco = new ArrayList<>();
         BigDecimal valorTotal = BigDecimal.ZERO;
 
         for (ItemPedidoReceiverDTO item : receiverDTO.getItens()) {
-            // Verifica produto
+            // Verifica se o produto existe
             var produto = productClient.buscarPorId(item.getProdutoId());
 
-            // Verifica estoque
+            // Verifica se há estoque suficiente
             var estoque = stockClient.buscarPorProductId(item.getProdutoId());
             if (estoque.quantidade() < item.getQuantidade()) {
-                throw new RuntimeException("Estoque insuficiente para produto ID " + item.getProdutoId());
+                throw new RuntimeException("Estoque insuficiente para o produto ID " + item.getProdutoId());
             }
 
-            // Soma valor
+            // Soma valor total do pedido
             BigDecimal preco = produto.preco();
             valorTotal = valorTotal.add(preco.multiply(BigDecimal.valueOf(item.getQuantidade())));
 
+            // Adiciona item formatado com preço
             itensComPreco.add(ItemPedidoDTO.builder()
                     .produtoId(item.getProdutoId())
                     .quantidade(item.getQuantidade())
@@ -60,7 +61,7 @@ public class PedidoReceiverService {
                     .build());
         }
 
-        // Cria pedido no order-service
+        // Cria o pedido no order-service
         PedidoRequestDTO pedidoDTO = PedidoRequestDTO.builder()
                 .clienteId(receiverDTO.getClienteId())
                 .itens(itensComPreco)
@@ -68,20 +69,21 @@ public class PedidoReceiverService {
 
         PedidoResponseDTO pedidoCriado = orderClient.criarPedido(pedidoDTO);
 
-        // Realiza pagamento
+        // Realiza o pagamento com base no valor total
         PagamentoRequestDTO pagamento = PagamentoRequestDTO.builder()
                 .pedidoId(pedidoCriado.getId())
                 .valor(valorTotal.doubleValue())
-                .numeroCartao("1234567890123456")
+                .numeroCartao("1234567890123456") // simulado
                 .build();
 
         PagamentoResponseDTO resultadoPagamento = pagamentoClient.pagar(pagamento);
 
-        // Define status
+        // Define o status final do pedido
         String statusFinal = resultadoPagamento.getStatus().equalsIgnoreCase("SUCESSO")
                 ? "FECHADO_COM_SUCESSO"
                 : "FECHADO_SEM_CREDITO";
 
+        // Atualiza o status do pedido
         orderClient.atualizarStatus(pedidoCriado.getId(), statusFinal);
 
         return pedidoCriado;

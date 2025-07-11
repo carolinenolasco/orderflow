@@ -4,16 +4,13 @@ import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@Builder
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor @Builder
 public class ItemPedidoReceiverDTO {
 
-    @NotNull(message = "Produto obrigatório")
+    @NotNull
     private Long produtoId;
 
-    @Min(value = 1, message = "Quantidade deve ser maior que 0")
+    @Min(1)
     private Integer quantidade;
 }
