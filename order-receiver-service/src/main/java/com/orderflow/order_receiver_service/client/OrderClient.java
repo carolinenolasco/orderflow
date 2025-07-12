@@ -1,5 +1,6 @@
 package com.orderflow.order_receiver_service.client;
 
+import com.orderflow.order_receiver_service.domain.StatusPedido;
 import com.orderflow.order_receiver_service.dto.PedidoRequestDTO;
 import com.orderflow.order_receiver_service.dto.PedidoResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -12,6 +13,5 @@ public interface OrderClient {
     PedidoResponseDTO criarPedido(@RequestBody PedidoRequestDTO dto);
 
     @PutMapping("/pedidos/{id}/status")
-    void atualizarStatus(@PathVariable Long id, @RequestParam String status);
+    void atualizarStatus(@PathVariable Long id, @RequestParam StatusPedido status);
 }
-

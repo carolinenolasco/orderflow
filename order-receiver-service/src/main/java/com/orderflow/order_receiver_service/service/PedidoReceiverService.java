@@ -1,6 +1,7 @@
 package com.orderflow.order_receiver_service.service;
 
 import com.orderflow.order_receiver_service.client.*;
+import com.orderflow.order_receiver_service.domain.StatusPedido;
 import com.orderflow.order_receiver_service.dto.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,12 +79,18 @@ public class PedidoReceiverService {
         PagamentoResponseDTO resultadoPagamento = pagamentoClient.pagar(pagamento);
 
         // Define status
-        String statusFinal = resultadoPagamento.getStatus().equalsIgnoreCase("SUCESSO")
-                ? "FECHADO_COM_SUCESSO"
-                : "FECHADO_SEM_CREDITO";
+        StatusPedido status = resultadoPagamento.getStatus().equalsIgnoreCase("SUCESSO")
+                ? StatusPedido.FECHADO_COM_SUCESSO
+                : StatusPedido.FECHADO_SEM_CREDITO;
 
-        orderClient.atualizarStatus(pedidoCriado.getId(), statusFinal);
+        orderClient.atualizarStatus(pedidoCriado.getId(), StatusPedido.valueOf(status.name()));
 
-        return pedidoCriado;
+        return PedidoResponseDTO.builder()
+                .id(pedidoCriado.getId())
+                .clienteId(pedidoCriado.getClienteId())
+                .dataPedido(pedidoCriado.getDataPedido())
+                .status(status)
+                .itens(itensComPreco)
+                .build();
     }
 }

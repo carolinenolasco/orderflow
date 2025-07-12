@@ -3,11 +3,12 @@ package com.orderflow.customer_service.service;
 import com.orderflow.customer_service.domain.Cliente;
 import com.orderflow.customer_service.repository.ClienteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class ClienteService {
 
     @Autowired
@@ -37,7 +38,7 @@ public class ClienteService {
         Cliente cliente = buscarPorId(id);
         cliente.setNome(clienteAtualizado.getNome());
         cliente.setEndereco(clienteAtualizado.getEndereco());
-        cliente.getDataNascimento(clienteAtualizado.getDataNascimento());
+        cliente.setDataNascimento(clienteAtualizado.getDataNascimento());
         return repository.save(cliente);
     }
 }
