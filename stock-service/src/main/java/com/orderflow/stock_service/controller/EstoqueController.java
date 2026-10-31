@@ -61,6 +61,16 @@ public class EstoqueController {
         service.deletar(id);
     }
 
+    @PutMapping("/produto/{productId}/baixa")
+    public EstoqueResponseDTO baixar(@PathVariable Long productId, @RequestParam Integer quantidade) {
+        return mapToResponse(service.baixar(productId, quantidade));
+    }
+
+    @PutMapping("/produto/{productId}/reposicao")
+    public EstoqueResponseDTO repor(@PathVariable Long productId, @RequestParam Integer quantidade) {
+        return mapToResponse(service.repor(productId, quantidade));
+    }
+
     private EstoqueResponseDTO mapToResponse(Estoque estoque) {
         return EstoqueResponseDTO.builder()
                 .id(estoque.getId())

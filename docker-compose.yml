@@ -1,72 +1,84 @@
-version: '3.8'
+x-spring: &spring
+  SPRING_DOCKER_COMPOSE_ENABLED: "false"
+  SPRING_DATASOURCE_USERNAME: user
+  SPRING_DATASOURCE_PASSWORD: pass
 
 services:
   postgres:
-    image: postgres
+    image: postgres:16
     container_name: postgres-orderflow
     environment:
-      POSTGRES_DB: clientes
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
     ports:
       - "5432:5432"
     volumes:
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
       - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   customer-service:
-    build:
-      context: ./customer-service
-    container_name: customer-service
-    ports:
-      - "8081:8081"
+    build: ./customer-service
+    ports: ["8081:8081"]
+    environment:
+      <<: *spring
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/clientes
     depends_on:
-      - postgres
+      postgres: { condition: service_healthy }
 
   product-service:
-    build:
-      context: ./product-service
-    container_name: product-service
-    ports:
-      - "8082:8082"
+    build: ./product-service
+    ports: ["8082:8082"]
+    environment:
+      <<: *spring
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/produtos
     depends_on:
-      - postgres
+      postgres: { condition: service_healthy }
 
   stock-service:
-    build:
-      context: ./stock-service
-    container_name: stock-service
-    ports:
-      - "8083:8083"
+    build: ./stock-service
+    ports: ["8083:8083"]
+    environment:
+      <<: *spring
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/estoque
     depends_on:
-      - postgres
+      postgres: { condition: service_healthy }
 
   order-service:
-    build:
-      context: ./order-service
-    container_name: order-service
-    ports:
-      - "8084:8084"
+    build: ./order-service
+    ports: ["8084:8084"]
+    environment:
+      <<: *spring
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/pedidos
     depends_on:
-      - postgres
+      postgres: { condition: service_healthy }
+
+  payment-service:
+    build: ./payment-service
+    ports: ["8086:8086"]
+    environment:
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
 
   order-receiver-service:
-    build:
-      context: ./order-receiver-service
-    container_name: order-receiver-service
-    ports:
-      - "8085:8085"
+    build: ./order-receiver-service
+    ports: ["8085:8085"]
+    environment:
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      SERVICES_CUSTOMER_URL: http://customer-service:8081
+      SERVICES_PRODUCT_URL: http://product-service:8082
+      SERVICES_STOCK_URL: http://stock-service:8083
+      SERVICES_ORDER_URL: http://order-service:8084
+      SERVICES_PAYMENT_URL: http://payment-service:8086
     depends_on:
       - customer-service
       - product-service
       - stock-service
       - order-service
-
-  payment-service:
-    build:
-      context: ./payment-service
-    container_name: payment-service
-    ports:
-      - "8086:8086"
+      - payment-service
 
 volumes:
   pgdata:

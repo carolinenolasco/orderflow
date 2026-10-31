@@ -1,9 +1,11 @@
 package com.orderflow.order_receiver_service.controller;
 
 import com.orderflow.order_receiver_service.dto.PedidoReceiverRequestDTO;
-import com.orderflow.order_receiver_service.queue.PedidoQueue;
+import com.orderflow.order_receiver_service.dto.PedidoResponseDTO;
+import com.orderflow.order_receiver_service.service.PedidoReceiverService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -11,11 +13,10 @@ import org.springframework.web.bind.annotation.*;
 public class PedidoReceiverController {
 
     @Autowired
-    private PedidoQueue pedidoQueue;
+    private PedidoReceiverService service;
 
     @PostMapping
-    public String checkout(@Valid @RequestBody PedidoReceiverRequestDTO dto) {
-        pedidoQueue.adicionar(dto);
-        return "✅ Pedido recebido e adicionado à fila.";
+    public ResponseEntity<PedidoResponseDTO> checkout(@Valid @RequestBody PedidoReceiverRequestDTO dto) {
+        return ResponseEntity.accepted().body(service.registrar(dto));
     }
 }

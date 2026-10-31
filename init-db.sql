@@ -1,0 +1,4 @@
+CREATE DATABASE clientes;
+CREATE DATABASE produtos;
+CREATE DATABASE estoque;
+CREATE DATABASE pedidos;

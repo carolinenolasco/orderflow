@@ -6,7 +6,7 @@ import com.orderflow.order_receiver_service.dto.PedidoResponseDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "order-service", url = "http://localhost:8084")
+@FeignClient(name = "order-service", url = "${services.order.url:http://localhost:8084}")
 public interface OrderClient {
 
     @PostMapping("/pedidos")

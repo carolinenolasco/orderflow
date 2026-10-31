@@ -6,12 +6,12 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
-@Builder
+@Getter @Setter
+@NoArgsConstructor @AllArgsConstructor @Builder
 public class PedidoResponseDTO {
     private Long id;
     private Long clienteId;
     private LocalDateTime dataPedido;
-    private StatusPedido status;  // troque String -> StatusPedido
+    private StatusPedido status;
     private List<ItemPedidoDTO> itens;
 }

@@ -4,6 +4,7 @@ import com.orderflow.stock_service.domain.Estoque;
 import com.orderflow.stock_service.repository.EstoqueRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -44,5 +45,22 @@ public class EstoqueService {
     public Estoque buscarPorProductId(Long productId) {
         return repository.findByProductId(productId)
                 .orElseThrow(() -> new RuntimeException("Estoque para o produto não encontrado"));
+    }
+
+    @Transactional
+    public Estoque baixar(Long productId, Integer quantidade) {
+        Estoque estoque = buscarPorProductId(productId);
+        if (estoque.getQuantidade() < quantidade) {
+            throw new RuntimeException("Estoque insuficiente para o produto " + productId);
+        }
+        estoque.setQuantidade(estoque.getQuantidade() - quantidade);
+        return repository.save(estoque);
+    }
+
+    @Transactional
+    public Estoque repor(Long productId, Integer quantidade) {
+        Estoque estoque = buscarPorProductId(productId);
+        estoque.setQuantidade(estoque.getQuantidade() + quantidade);
+        return repository.save(estoque);
     }
 }

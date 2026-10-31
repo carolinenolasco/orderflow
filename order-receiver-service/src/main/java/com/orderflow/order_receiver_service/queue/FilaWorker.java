@@ -1,6 +1,5 @@
 package com.orderflow.order_receiver_service.queue;
 
-import com.orderflow.order_receiver_service.dto.PedidoReceiverRequestDTO;
 import com.orderflow.order_receiver_service.service.PedidoReceiverService;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
@@ -20,19 +19,18 @@ public class FilaWorker {
     @PostConstruct
     public void iniciar() {
         Thread worker = new Thread(() -> {
-            while (true) {
+            while (!Thread.currentThread().isInterrupted()) {
                 try {
-                    PedidoReceiverRequestDTO pedido = pedidoQueue.proximoPedido();
-                    log.info("🛠️ Processando pedido da fila: cliente {}", pedido.getClienteId());
-
-                    receiverService.processarPedido(pedido);
-
-                    log.info("✅ Pedido processado com sucesso.");
+                    PedidoNaFila pedido = pedidoQueue.proximoPedido();
+                    log.info("Processando pedido {}", pedido.getPedidoId());
+                    receiverService.processar(pedido);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
                 } catch (Exception e) {
-                    log.error("❌ Erro ao processar pedido da fila: " + e.getMessage());
+                    log.error("Erro ao processar pedido da fila: {}", e.getMessage(), e);
                 }
             }
-        });
+        }, "fila-pedidos-worker");
 
         worker.setDaemon(true);
         worker.start();
