@@ -9,6 +9,7 @@ O cliente faz um checkout, o pedido é registrado e processado em segundo plano:
 ## Tecnologias
 
 - Java 17 e Spring Boot 3.5
+- RabbitMQ (fila durável de pedidos)
 - Spring Cloud OpenFeign (chamadas REST entre serviços)
 - PostgreSQL 16 e Flyway (migrações)
 - Bean Validation e Lombok
@@ -25,6 +26,8 @@ O cliente faz um checkout, o pedido é registrado e processado em segundo plano:
 | `order-service` | 8084 | Pedidos, itens e status | `pedidos` |
 | `order-receiver-service` | 8085 | Recebe o checkout e orquestra o processamento | - |
 | `payment-service` | 8086 | Pagamento simulado (mock) | - |
+
+O checkout publica o pedido numa fila do RabbitMQ (`pedidos.processar`) e um consumidor o processa em segundo plano; o painel do broker fica em `http://localhost:15672` (guest/guest).
 
 Todos os bancos ficam em uma única instância do PostgreSQL, criados pelo `init-db.sql`.
 
@@ -149,7 +152,9 @@ curl localhost:8083/estoques/produto/1
 
 ## Limitações conhecidas e próximos passos
 
-- A fila de pedidos do `order-receiver-service` é em memória (`LinkedBlockingQueue`): se o serviço reiniciar, os pedidos pendentes na fila são perdidos. O plano é trocar por RabbitMQ.
+- O `processar` não é idempotente como um todo: se o consumidor falhar depois de baixar o estoque e a mensagem for reprocessada, o estoque pode ser baixado duas vezes. O pagamento já é idempotente por `pedidoId`.
+- O número do cartão trafega na mensagem da fila por simplificação; em produção, o correto é usar um token.
+- Mensagens que falham 3 vezes são descartadas, sem fila de mensagens mortas (DLQ).
 - O pagamento é um mock. A idempotência é por `pedidoId` e fica em memória: o mesmo pedido nunca é cobrado duas vezes, mas o registro se perde se o serviço reiniciar (o passo seguinte seria persistir em banco).
 - Ainda não há autenticação.
 - Faltam testes automatizados além do `contextLoads` e um pipeline de CI.

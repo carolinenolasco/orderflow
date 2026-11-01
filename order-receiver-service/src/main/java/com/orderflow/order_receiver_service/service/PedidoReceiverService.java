@@ -75,14 +75,14 @@ public class PedidoReceiverService {
 
         // 1) Baixa de estoque (se faltar algum item, devolve os que já baixou)
         try {
-            for (ItemPedidoDTO item : pedido.getItens()) {
+            for (ItemPedidoDTO item : pedido.itens()) {
                 stockClient.baixar(item.getProdutoId(), item.getQuantidade());
                 baixados.add(item);
             }
         } catch (Exception e) {
-            log.warn("Pedido {} sem estoque: {}", pedido.getPedidoId(), e.getMessage());
+            log.warn("Pedido {} sem estoque: {}", pedido.pedidoId(), e.getMessage());
             reporEstoque(baixados);
-            orderClient.atualizarStatus(pedido.getPedidoId(), StatusPedido.FECHADO_SEM_ESTOQUE);
+            orderClient.atualizarStatus(pedido.pedidoId(), StatusPedido.FECHADO_SEM_ESTOQUE);
             return;
         }
 
@@ -90,25 +90,25 @@ public class PedidoReceiverService {
         boolean aprovado;
         try {
             PagamentoResponseDTO resposta = pagamentoClient.pagar(PagamentoRequestDTO.builder()
-                    .pedidoId(pedido.getPedidoId())
-                    .valor(pedido.getValorTotal().doubleValue())
-                    .numeroCartao(pedido.getNumeroCartao())
+                    .pedidoId(pedido.pedidoId())
+                    .valor(pedido.valorTotal().doubleValue())
+                    .numeroCartao(pedido.numeroCartao())
                     .build());
             aprovado = "SUCESSO".equalsIgnoreCase(resposta.getStatus());
         } catch (Exception e) {
-            log.warn("Falha ao pagar pedido {}: {}", pedido.getPedidoId(), e.getMessage());
+            log.warn("Falha ao pagar pedido {}: {}", pedido.pedidoId(), e.getMessage());
             aprovado = false;
         }
 
         if (!aprovado) {
             reporEstoque(baixados);
-            orderClient.atualizarStatus(pedido.getPedidoId(), StatusPedido.FECHADO_SEM_CREDITO);
+            orderClient.atualizarStatus(pedido.pedidoId(), StatusPedido.FECHADO_SEM_CREDITO);
             return;
         }
 
         // 3) Sucesso
-        orderClient.atualizarStatus(pedido.getPedidoId(), StatusPedido.FECHADO_COM_SUCESSO);
-        log.info("Pedido {} fechado com sucesso", pedido.getPedidoId());
+        orderClient.atualizarStatus(pedido.pedidoId(), StatusPedido.FECHADO_COM_SUCESSO);
+        log.info("Pedido {} fechado com sucesso", pedido.pedidoId());
     }
 
     private void reporEstoque(List<ItemPedidoDTO> itens) {

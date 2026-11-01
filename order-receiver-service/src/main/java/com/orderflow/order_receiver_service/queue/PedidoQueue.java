@@ -1,20 +1,19 @@
 package com.orderflow.order_receiver_service.queue;
 
+import com.orderflow.order_receiver_service.config.RabbitConfig;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
-
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 
 @Component
 public class PedidoQueue {
 
-    private final BlockingQueue<PedidoNaFila> fila = new LinkedBlockingQueue<>();
+    private final RabbitTemplate rabbitTemplate;
 
-    public void adicionar(PedidoNaFila pedido) {
-        fila.add(pedido);
+    public PedidoQueue(RabbitTemplate rabbitTemplate) {
+        this.rabbitTemplate = rabbitTemplate;
     }
 
-    public PedidoNaFila proximoPedido() throws InterruptedException {
-        return fila.take();
+    public void adicionar(PedidoNaFila pedido) {
+        rabbitTemplate.convertAndSend(RabbitConfig.FILA_PEDIDOS, pedido);
     }
 }
