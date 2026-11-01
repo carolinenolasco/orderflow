@@ -150,6 +150,6 @@ curl localhost:8083/estoques/produto/1
 ## Limitações conhecidas e próximos passos
 
 - A fila de pedidos do `order-receiver-service` é em memória (`LinkedBlockingQueue`): se o serviço reiniciar, os pedidos pendentes na fila são perdidos. O plano é trocar por RabbitMQ.
-- O pagamento é um mock e não tem idempotência.
+- O pagamento é um mock. A idempotência é por `pedidoId` e fica em memória: o mesmo pedido nunca é cobrado duas vezes, mas o registro se perde se o serviço reiniciar (o passo seguinte seria persistir em banco).
 - Ainda não há autenticação.
 - Faltam testes automatizados além do `contextLoads` e um pipeline de CI.

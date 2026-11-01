@@ -4,12 +4,22 @@ import com.orderflow.payment_service.dto.PagamentoRequestDTO;
 import com.orderflow.payment_service.dto.PagamentoResponseDTO;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class PagamentoService {
 
+    // Resultado já processado de cada pedido (garante que o mesmo pedido nunca é cobrado duas vezes)
+    private final Map<Long, PagamentoResponseDTO> processados = new ConcurrentHashMap<>();
+
     public PagamentoResponseDTO processarPagamento(PagamentoRequestDTO dto) {
+        // computeIfAbsent é atômico: chamadas simultâneas para o mesmo pedido processam uma única vez
+        return processados.computeIfAbsent(dto.getPedidoId(), id -> executar(dto));
+    }
+
+    private PagamentoResponseDTO executar(PagamentoRequestDTO dto) {
         // Simula cartão inválido se começa com 0000
         if (dto.getNumeroCartao().startsWith("0000")) {
             return PagamentoResponseDTO.builder()
