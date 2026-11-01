@@ -138,10 +138,10 @@ curl localhost:8083/estoques/produto/1
 
 | Serviço | Endpoints |
 |---|---|
-| customer | `POST/GET /clientes`, `GET /clientes/{id}` |
-| product | `POST/GET /produtos`, `GET /produtos/{id}` |
-| stock | `POST/GET /estoques`, `GET /estoques/produto/{productId}`, `PUT /estoques/produto/{productId}/baixa?quantidade=N`, `PUT /estoques/produto/{productId}/reposicao?quantidade=N` |
-| order | `POST/GET /pedidos`, `GET /pedidos/{id}`, `PUT /pedidos/{id}/status?status=...` |
+| customer | `POST /clientes`, `GET /clientes`, `GET /clientes/{id}`, `PUT /clientes/{id}`, `DELETE /clientes/{id}` |
+| product | `POST /produtos`, `GET /produtos`, `GET /produtos/{id}`, `PUT /produtos/{id}`, `DELETE /produtos/{id}` |
+| stock | `POST /estoques`, `GET /estoques`, `GET /estoques/{id}`, `GET /estoques/produto/{productId}`, `PUT /estoques/{id}`, `DELETE /estoques/{id}`, `PUT /estoques/produto/{productId}/baixa?quantidade=N`, `PUT /estoques/produto/{productId}/reposicao?quantidade=N` |
+| order | `POST /pedidos`, `GET /pedidos`, `GET /pedidos/{id}`, `PUT /pedidos/{id}/status?status=...`, `DELETE /pedidos/{id}` |
 | receiver | `POST /checkout` |
 | payment | `POST /pagamentos` |
 
