@@ -1,5 +1,7 @@
 # orderflow
 
+![CI](https://github.com/carolinenolasco/orderflow/actions/workflows/ci.yml/badge.svg)
+
 Sistema de gerenciamento de pedidos com microsserviços.
 
 O cliente faz um checkout, o pedido é registrado e processado em segundo plano: o estoque é reservado, o pagamento é cobrado e, se algo falhar, as etapas anteriores são desfeitas (compensação).
